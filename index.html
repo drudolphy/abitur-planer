@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Abitur-Planer BGY</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Condensed:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* Layout: Einstellungen oben als Raster, darunter Prüfungsvarianten, Einbringungstabelle (zugleich Notenraster), Block II, Regeln */
+  --bg:#f4f4f1; --surface:#ffffff; --ink:#1c2230; --muted:#5b6372; --line:#d9d8d2;
+  --accent:#b3261e; --accent-ink:#ffffff; --accent-soft:#f7e2df;
+  --lf:#f2d4d7; --pf:#d9e6f6; --sel:#dcefe0; --dim:#efeee9;
+  --ok:#1d7a3e; --warn:#9a5a00; --bad:#b3261e;
+  --font-display:'IBM Plex Sans Condensed','Arial Narrow',sans-serif;
+  --font-body:'IBM Plex Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --font-mono:'IBM Plex Mono',ui-monospace,Consolas,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#13161c; --surface:#1b1f27; --ink:#e7e8eb; --muted:#a2a9b6; --line:#2f3542;
+  --accent:#ff7d70; --accent-ink:#1b0f0e; --accent-soft:#3b201e;
+  --lf:#46282d; --pf:#20314a; --sel:#1f3a28; --dim:#232832;
+  --ok:#62d08c; --warn:#f0b35a; --bad:#ff7d70; color-scheme:dark;}}
+:root[data-theme="dark"]{
+  --bg:#13161c; --surface:#1b1f27; --ink:#e7e8eb; --muted:#a2a9b6; --line:#2f3542;
+  --accent:#ff7d70; --accent-ink:#1b0f0e; --accent-soft:#3b201e;
+  --lf:#46282d; --pf:#20314a; --sel:#1f3a28; --dim:#232832;
+  --ok:#62d08c; --warn:#f0b35a; --bad:#ff7d70; color-scheme:dark;}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:15px/1.5 var(--font-body)}
+.wrap{max-width:1120px;margin:0 auto;padding:20px 16px 60px;display:grid;gap:22px}
+header{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px;border-bottom:3px solid var(--accent);padding-bottom:12px}
+h1{font:700 30px/1.1 var(--font-display);margin:0;letter-spacing:.2px;text-wrap:balance}
+h1 small{display:block;font:500 14px/1.4 var(--font-body);color:var(--muted);letter-spacing:0;margin-top:4px}
+h2{font:700 20px/1.2 var(--font-display);margin:0;text-wrap:balance;display:flex;gap:10px;align-items:baseline}
+h2 .no{font:600 13px var(--font-mono);color:var(--accent)}
+.sect{display:grid;gap:12px}
+.lead{color:var(--muted);margin:0;max-width:72ch}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+.settings{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}
+.field{display:grid;gap:6px;align-content:start}
+.field>label,.field>.lbl{font-weight:600;font-size:13px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px}
+select,input[type=text]{font:inherit;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:7px;padding:8px 10px;width:100%}
+select:focus-visible,input:focus-visible,button:focus-visible,.opt:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.radios{display:grid;gap:6px}
+.radios label,.check{display:flex;gap:8px;align-items:flex-start;font-size:14px;cursor:pointer}
+.radios input,.check input{margin-top:3px;accent-color:var(--accent)}
+.jginfo{border-left:4px solid var(--accent);background:var(--accent-soft);border-radius:0 8px 8px 0;padding:10px 14px;display:grid;gap:4px}
+.jginfo b{font-family:var(--font-display);font-size:16px}
+.jginfo ul{margin:0;padding-left:18px}
+.opts{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
+.opt{background:var(--surface);border:1.5px solid var(--line);border-radius:10px;padding:10px 12px;cursor:pointer;display:grid;gap:4px;text-align:left;font:inherit;color:inherit}
+.opt:hover{border-color:var(--muted)}
+.opt[aria-pressed="true"]{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-soft) inset}
+.opt .tag{font:600 12px var(--font-mono);color:var(--accent)}
+.opt .subs{font-weight:600;font-size:16px}
+.opt .meta{font-size:12.5px;color:var(--muted)}
+.opt .score{font:600 14px var(--font-mono)}
+.badge{display:inline-block;font:600 11px var(--font-body);padding:1px 7px;border-radius:99px;background:var(--accent);color:var(--accent-ink);vertical-align:1px}
+.badge.ok{background:var(--ok);color:var(--surface)}
+.opt.off{opacity:.55;cursor:not-allowed}
+.vol{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.vol select{width:auto;min-width:220px}
+.summary{display:flex;flex-wrap:wrap;gap:10px}
+.tile{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 14px;min-width:150px;display:grid}
+.tile .k{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;font-weight:600}
+.tile .v{font:600 24px/1.2 var(--font-mono);font-variant-numeric:tabular-nums}
+.tile .s{font-size:12.5px;color:var(--muted)}
+.tile.good{border-color:var(--ok)} .tile.good .v{color:var(--ok)}
+.tile.badt{border-color:var(--bad)} .tile.badt .v{color:var(--bad)}
+[hidden]{display:none!important}
+.savebox{display:grid;gap:10px}
+textarea{font:13px var(--font-mono);color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:7px;padding:8px;width:100%;resize:vertical}
+.toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+button.btn{font:600 14px var(--font-body);border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:7px;padding:7px 12px;cursor:pointer}
+button.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums}
+th,td{padding:7px 9px;border-bottom:1px solid var(--line);text-align:left;vertical-align:middle}
+thead th{font-size:12px;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);background:var(--dim);position:sticky;top:0}
+tbody tr:last-child td{border-bottom:none}
+td.fach{font-weight:600;min-width:170px}
+td.fach .x2{font:600 11px var(--font-mono);background:var(--accent);color:var(--accent-ink);border-radius:4px;padding:0 5px;margin-left:6px}
+.role{display:inline-block;font-size:12px;font-weight:600;padding:2px 8px;border-radius:99px;white-space:nowrap}
+.role.LF{background:var(--lf)} .role.PF{background:var(--pf)} .role.GF,.role.KF,.role.GFfw{background:var(--dim)}
+td.c{text-align:center;width:74px;font-size:12.5px;color:var(--muted)}
+td.c.must{color:var(--ink);font-weight:600}
+td.c.must::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--accent);margin-right:5px;vertical-align:1px}
+td.c.alt::before{background:transparent;border:1.5px solid var(--accent)}
+td.c.na{color:var(--line)}
+td.c.in{background:var(--sel)}
+td.c.out input{opacity:.55}
+td.c input::placeholder,.b2grid input::placeholder{color:var(--muted);opacity:.75;font-style:italic}
+td.c input{width:46px;text-align:center;padding:5px 4px;font:600 14px var(--font-mono)}
+td.c.in input{border-color:var(--ok)}
+td.c.zero input{border-color:var(--bad);color:var(--bad)}
+td.rule{font-size:13px;color:var(--muted);min-width:200px}
+.legend{display:flex;flex-wrap:wrap;gap:14px;font-size:13px;color:var(--muted)}
+.legend span{display:inline-flex;gap:6px;align-items:center}
+.sw{width:14px;height:14px;border-radius:3px;display:inline-block;border:1px solid var(--line)}
+.msg{border-radius:8px;padding:9px 12px;font-size:14px}
+.msg.bad{background:var(--accent-soft);color:var(--bad);font-weight:500}
+.msg.info{background:var(--dim)}
+.b2grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px}
+.b2grid .card{display:grid;gap:6px;padding:10px 12px}
+.b2grid .row{display:flex;gap:8px;align-items:center;font-size:13px;color:var(--muted)}
+.b2grid input{width:64px;font:600 15px var(--font-mono);text-align:center}
+.rules{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px}
+.rules ul{margin:6px 0 0;padding-left:18px}
+.rules li{margin:3px 0}
+.rules h3{font:700 16px var(--font-display);margin:0}
+.foot{font-size:12.5px;color:var(--muted)}
+.foot a{color:var(--accent)}
+@media (prefers-reduced-motion:no-preference){.opt,.tile{transition:border-color .15s}}
+@media (max-width:560px){h1{font-size:25px} td.rule{min-width:150px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <h1>Abitur-Planer Berufliches Gymnasium<small>BBS Idar-Oberstein – Harald-Fissler-Schule · Was du ins Abitur einbringen musst und welche Kombination die meisten Punkte bringt</small></h1>
+</header>
+
+<section class="sect" aria-labelledby="s1">
+  <h2 id="s1"><span class="no">01</span>Deine Ausgangslage</h2>
+  <div class="settings card">
+    <div class="field"><label for="jg">Eintritt ins BGY (Klasse 11)</label>
+      <select id="jg">
+        <option value="2023">Sommer 2023 · BGY23 (Wiederholer)</option>
+        <option value="2024">Sommer 2024 · BGY24 · Abitur 2027</option>
+        <option value="2025">Sommer 2025 · BGY25 · Abitur 2028</option>
+        <option value="2026">Sommer 2026 · BGY26 · Abitur 2029</option>
+      </select></div>
+    <div class="field"><label for="fr">Fachrichtung</label>
+      <select id="fr"><option value="T">Technik</option><option value="W">Wirtschaft</option></select></div>
+    <div class="field"><label for="combo">Fächerkombination</label><select id="combo"></select></div>
+    <div class="field"><label for="nw">Naturwissenschaft (Pflicht)</label><select id="nw"></select></div>
+    <div class="field"><label for="rel">Religion/Ethik</label>
+      <select id="rel"><option value="EV">Evangelische Religion</option><option value="KA">Katholische Religion</option><option value="ETH">Ethik</option></select></div>
+    <div class="field"><label for="kf">Künstlerisches Fach (Jgst. 12)</label>
+      <select id="kf"><option value="BK">Bildende Kunst</option><option value="DS">Darstellendes Spiel</option></select></div>
+    <div class="field" style="grid-column:span 2;min-width:0"><span class="lbl">Spanisch / zweite Fremdsprache</span>
+      <div class="radios" role="radiogroup" aria-label="Zweite Fremdsprache">
+        <label><input type="radio" name="fs2" id="fs2-neu" value="neu"> Keine 2. Fremdsprache in Klasse 7–10: Spanisch ist für mich Pflicht (seit Klasse 11)</label>
+        <label><input type="radio" name="fs2" id="fs2-fort" value="fort"> Fremdsprachenpflicht aus Klasse 7–10 erfüllt, Spanisch belege ich in 12/13 freiwillig</label>
+        <label><input type="radio" name="fs2" id="fs2-nicht" value="nicht"> Fremdsprachenpflicht aus Klasse 7–10 erfüllt, kein Spanisch in 12/13</label>
+      </div></div>
+    <div class="field" id="spField"><span class="lbl">Sport-Leistungsfach</span>
+      <label class="check" id="spSingleWrap"><input type="checkbox" id="spSingle"> Sport-Leistungsfach zählt nur einfach (Theorie/Praxis mehrfach unter 4 Punkten)</label>
+    </div>
+  </div>
+  <div class="jginfo" id="jginfo"></div>
+  <div class="card savebox">
+    <div><b>Meine Eingaben sichern</b><br><span class="foot">Alles wird in diesem Browser automatisch gespeichert. Für ein anderes Gerät oder zur Sicherheit speicherst du deinen Stand als Datei oder als Speichercode (z. B. in deinen Notizen).</span></div>
+    <div class="toolbar">
+      <button type="button" class="btn primary" id="saveFile">Als Datei speichern</button>
+      <button type="button" class="btn" id="loadFileBtn">Datei laden</button>
+      <input type="file" id="loadFile" accept=".json,application/json" hidden>
+      <button type="button" class="btn" id="copyCode">Speichercode kopieren</button>
+      <button type="button" class="btn" id="pasteCode">Speichercode einfügen</button>
+    </div>
+    <div id="codeArea" class="sect" hidden>
+      <label for="codeText" class="foot">Speichercode hier einfügen bzw. kopieren:</label>
+      <textarea id="codeText" rows="3"></textarea>
+      <div class="toolbar"><button type="button" class="btn primary" id="applyCode">Speichercode übernehmen</button><button type="button" class="btn" id="closeCode">Schließen</button></div>
+    </div>
+    <div id="saveMsg" class="foot" role="status"></div>
+  </div>
+</section>
+
+<section class="sect" aria-labelledby="s2">
+  <h2 id="s2"><span class="no">02</span>Mündliche Prüfung: deine Möglichkeiten</h2>
+  <p class="lead" id="oralLead"></p>
+  <div class="opts" id="opts"></div>
+</section>
+
+<section class="sect" aria-labelledby="s3">
+  <h2 id="s3"><span class="no">03</span>Das musst du in Block I einbringen</h2>
+  <div class="summary" id="summary"></div>
+  <div class="toolbar">
+    <label class="check"><input type="checkbox" id="gradesOn"> Noten eingeben und beste Einbringung berechnen</label>
+    <span id="gradeTools" class="toolbar"></span>
+  </div>
+  <div id="messages" class="sect"></div>
+  <div class="tablewrap"><table id="plan"></table></div>
+  <div class="legend" id="legend"></div>
+</section>
+
+<section class="sect" aria-labelledby="sF">
+  <h2 id="sF"><span class="no">04</span>Prognose: Werde ich zugelassen?</h2>
+  <div id="forecast" class="sect"></div>
+</section>
+
+<section class="sect" aria-labelledby="s4" id="b2sect">
+  <h2 id="s4"><span class="no">05</span>Abiturprüfung (Block II) und Abiturnote</h2>
+  <p class="lead">Trage erwartete oder erreichte Prüfungsergebnisse ein (0–15 Punkte). Leere Felder rechnet der Planer mit deinem Kursschnitt im Fach (grau). Eine freiwillige mündliche Zusatzprüfung in einem Leistungsfach wird 2 : 1 mit der schriftlichen Note verrechnet und kann auch verschlechtern.</p>
+  <div class="b2grid" id="b2"></div>
+  <div class="summary" id="b2sum"></div>
+</section>
+
+<section class="sect" aria-labelledby="s5">
+  <h2 id="s5"><span class="no">06</span>Die Regeln dahinter</h2>
+  <div class="rules">
+    <div class="card"><h3>Block I – Qualifikationsphase</h3><ul>
+      <li>Genau <b>36 Kurse</b> aus 12/1 bis 13/2 werden eingebracht (am BGY ersetzt ein zusätzlicher Kurs die Facharbeit).</li>
+      <li>Alle Kurse der <b>3 Leistungsfächer</b> und der <b>mündlichen Prüfungsfächer</b>. Die zwei Leistungsfächer mit der höheren Punktsumme zählen <b>doppelt</b>.</li>
+      <li>Pflicht, soweit nicht schon Prüfungsfach: je 4 Kurse Deutsch, Mathematik, eine Naturwissenschaft und eine Fremdsprache (Englisch oder Spanisch); immer alle 4 Kurse Gemeinschaftskunde, auch wenn Religion/Ethik mündliches Prüfungsfach ist; 12/1 und 12/2 im künstlerischen Fach.</li>
+      <li>Spanisch als Pflicht (neu ab 11): mindestens 2 Kurse, darunter 13/2; kein Kurs mit 0 Punkten. Wer die Fremdsprachenpflicht schon aus Klasse 7–10 erfüllt hat: mindestens 1 Kurs Spanisch (wenn freiwillig belegt) oder IV.</li>
+      <li>Fachrichtung Wirtschaft: zusätzlich je mindestens 1 Kurs BWL/RW und VWL.</li>
+      <li>Wer aus einem Pflicht-Grundfach einen Kurs einbringt, muss den Kurs <b>13/2</b> mit einbringen.</li>
+      <li>Kein Kurs mit 0 Punkten, höchstens 7 Kurse unter 5 Punkten, mindestens 200 Punkte. Block I = Punktsumme (36 Kurse + 8 doppelte) × 40/44.</li>
+    </ul></div>
+    <div class="card"><h3>Block II – Prüfung</h3><ul>
+      <li>Schriftlich: die drei Leistungsfächer. Mündlich: ein oder zwei Grundfächer.</li>
+      <li>Die Prüfungsfächer müssen ein <b>Profil</b> vollständig abdecken. Mathematisch-naturwissenschaftlich: M, eine NW (oder Technik, IV), ein gesellschaftswiss. Fach, D oder eine Fremdsprache. Sprachlich: D, eine Fremdsprache, ein gesellschaftswiss. Fach, M oder eine NW (oder Technik).</li>
+      <li>Gesellschaftswissenschaftlich zählen GK, Religion/Ethik, BWL/RW und VWL.</li>
+      <li>Reicht ein mündliches Fach für ein Profil, gibt es 4 Prüfungsfächer, sonst 5.</li>
+      <li>Mündlich prüfbar sind Grundfächer, die ab Klasse 11 durchgehend belegt wurden – nicht Sport. </li>
+      <li>4 Prüfungsfächer: Summe × 5, mindestens 2 Fächer mit 5 Punkten. 5 Prüfungsfächer: Summe × 4, mindestens 3 Fächer mit 5 Punkten. Block II mindestens 100 Punkte.</li>
+      <li>Eintritt ins Prüfungshalbjahr 13/2 nur, wer Block I noch erreichen kann; zur Prüfung zugelassen wird, wer Block I erreicht hat.</li>
+      <li>Abiturnote = 17/3 − Gesamtpunkte/180, auf eine Nachkommastelle abgeschnitten; ab 823 Punkten 1,0.</li>
+    </ul></div>
+    <div class="card"><h3>Änderungen nach Eintrittsjahrgang</h3><ul>
+      <li><b>Eintritt ab 1.8.2023:</b> Siebte Änderungsverordnung zur LVO über das berufliche Gymnasium (12.07.2023): Sport kann Leistungsfach sein, Fächergruppe Religion/Ethik, neue Fächerkombinationstafeln. Ältere Bildungsgänge laufen nach alter Fassung weiter.</li>
+      <li><b>Eintritt ab 1.8.2025:</b> Achte Änderungsverordnung (25.03.2025) mit neuen Fächerkombinationstafeln; neue Durchführungs-Verwaltungsvorschrift (24.06.2025), erstmals für Jgst. 11 im Schuljahr 2025/26: bis zu <b>4 Sportkurse</b> statt 3, Pflichtkurs Spanisch/IV: bei freiwilligem Spanisch reicht ein beliebiger Kurs.</li>
+    </ul></div>
+  </div>
+  <p class="foot">Planungshilfe ohne Gewähr. Verbindlich sind die Abiturprüfungsordnung (AbiPrO vom 21.07.2010 i. d. j. g. F.), die Landesverordnung über das berufliche Gymnasium mit Fächerkombinationstafel, die Verwaltungsvorschrift zu ihrer Durchführung und die Beratung durch die Oberstufenleitung. Deine Noten bleiben nur in diesem Browser gespeichert. Quellen: <a href="https://bm.rlp.de/fileadmin/09/05_Service/Dokumente/Amtsblatt/Archiv/2023/08-August.pdf">Amtsblatt 8/2023</a>, <a href="https://bm.rlp.de/fileadmin/09/05_Service/Dokumente/Amtsblatt/Archiv/2025/Mai_Amtsblatt.pdf">Amtsblatt 5/2025</a>, <a href="https://bm.rlp.de/fileadmin/09/05_Service/Dokumente/Amtsblatt/Archiv/2025/Juli_Amtsblatt.pdf">Amtsblatt 7/2025</a>, <a href="https://bildung.rlp.de/fileadmin/user_upload/bbs/Informationen_und_Materialien/Schulformbezogene_Informationen/Berufliches_Gymnasium/2019-01-30_Detail-Informationen_BGY.pdf">Detail-Informationen BGY</a>.</p>
+</section>
+</div>
+
+<script>
+/* ===== Regel-Engine Abitur BGY (Rheinland-Pfalz) ===== */
+const SUBJ = {
+  T:   { n: 'Technik', s: 'Technik', role: 'NW' },
+  BWL: { n: 'BWL/Rechnungswesen', s: 'BWL', role: 'GW' },
+  VWL: { n: 'Volkswirtschaftslehre', s: 'VWL', role: 'GW' },
+  D:   { n: 'Deutsch', s: 'D', role: 'D' },
+  E:   { n: 'Englisch', s: 'E', role: 'FS' },
+  M:   { n: 'Mathematik', s: 'M', role: 'M' },
+  IV:  { n: 'Informationsverarbeitung', s: 'IV', role: 'IV' },
+  GK:  { n: 'Gemeinschaftskunde', s: 'GK', role: 'GW' },
+  SP:  { n: 'Sport', s: 'Sp', role: null },
+  NW:  { n: 'Naturwissenschaft', s: 'NW', role: 'NW' },
+  REL: { n: 'Religion/Ethik', s: 'Rel/Eth', role: 'GW' },
+  FS2: { n: 'Spanisch', s: 'Spanisch', role: 'FS' },
+  KF:  { n: 'Künstlerisches Fach', s: 'KF', role: null },
+  NW2: { n: '2. Naturwissenschaft', s: 'NW₂', role: 'NW' }
+};
+const NWNAMES = { CH: 'Chemie', PH: 'Physik', BIO: 'Biologie' };
+const RELNAMES = { EV: 'Evangelische Religion', KA: 'Katholische Religion', ETH: 'Ethik' };
+const KFNAMES = { BK: 'Bildende Kunst', DS: 'Darstellendes Spiel' };
+
+/* Kombinationen laut Kurswahlbögen BGY25 (Kurswahl 2026): [Nr, Leistungsfächer, Pflicht-Grundfächer (×)] */
+const COMBOS = {
+  T: [
+    ['T1', ['T', 'D', 'M'], ['SP', 'GK', 'E', 'IV']],
+    ['T3', ['T', 'M', 'E'], ['SP', 'GK', 'D', 'IV']],
+    ['T5', ['T', 'M', 'GK'], ['SP', 'D', 'E', 'IV']],
+    ['T7', ['T', 'IV', 'E'], ['SP', 'GK', 'D', 'M']],
+    ['T8', ['T', 'IV', 'D'], ['SP', 'GK', 'E', 'M']],
+    ['T9', ['T', 'E', 'SP'], ['GK', 'D', 'M', 'IV']],
+    ['T10', ['T', 'D', 'SP'], ['GK', 'E', 'M', 'IV']]
+  ],
+  W: [
+    ['W1', ['BWL', 'VWL', 'E'], ['SP', 'GK', 'D', 'M', 'IV']],
+    ['W2', ['BWL', 'VWL', 'M'], ['SP', 'GK', 'D', 'E', 'IV']],
+    ['W3', ['BWL', 'VWL', 'D'], ['SP', 'GK', 'E', 'M', 'IV']],
+    ['W4', ['BWL', 'E', 'M'], ['SP', 'GK', 'D', 'IV', 'VWL']],
+    ['W5', ['BWL', 'E', 'D'], ['SP', 'GK', 'M', 'IV', 'VWL']],
+    ['W6', ['BWL', 'M', 'D'], ['SP', 'GK', 'E', 'IV', 'VWL']],
+    ['W7', ['VWL', 'E', 'M'], ['SP', 'GK', 'D', 'IV', 'BWL']],
+    ['W8', ['VWL', 'E', 'D'], ['SP', 'GK', 'M', 'IV', 'BWL']],
+    ['W9', ['VWL', 'M', 'D'], ['SP', 'GK', 'E', 'IV', 'BWL']],
+    ['W10', ['BWL', 'IV', 'E'], ['SP', 'GK', 'D', 'M', 'VWL']],
+    ['W11', ['BWL', 'IV', 'D'], ['SP', 'GK', 'E', 'M', 'VWL']],
+    ['W12', ['BWL', 'IV', 'M'], ['SP', 'GK', 'D', 'E', 'VWL']],
+    ['W13', ['VWL', 'IV', 'E'], ['SP', 'GK', 'D', 'M', 'BWL']],
+    ['W14', ['VWL', 'IV', 'D'], ['SP', 'GK', 'E', 'M', 'BWL']],
+    ['W15', ['VWL', 'IV', 'M'], ['SP', 'GK', 'D', 'E', 'BWL']],
+    ['W16', ['BWL', 'M', 'SP'], ['GK', 'D', 'E', 'IV', 'VWL']],
+    ['W17', ['BWL', 'E', 'SP'], ['GK', 'D', 'M', 'IV', 'VWL']],
+    ['W18', ['VWL', 'D', 'SP'], ['GK', 'E', 'M', 'IV', 'BWL']],
+    ['W19', ['BWL', 'D', 'SP'], ['GK', 'E', 'M', 'IV', 'VWL']]
+  ]
+};
+const NWOPT = { T: ['CH', 'PH'], W: ['CH', 'PH', 'BIO'] };
+
+/* Regeln je Eintrittsjahrgang (Eintritt in Jgst. 11 zum 1. August) */
+const JG = {
+  2023: { abi: 2026, sportMax: 3, oldTwoFS: true,  sportLF: true, tafel: '7. ÄndVO 2023' },
+  2024: { abi: 2027, sportMax: 3, oldTwoFS: true,  sportLF: true, tafel: '7. ÄndVO 2023' },
+  2025: { abi: 2028, sportMax: 4, oldTwoFS: false, sportLF: true, tafel: '8. ÄndVO 2025' },
+  2026: { abi: 2029, sportMax: 4, oldTwoFS: false, sportLF: true, tafel: '8. ÄndVO 2025' }
+};
+const HJ = ['12/1', '12/2', '13/1', '13/2'];
+const ORDER = ['T', 'BWL', 'VWL', 'D', 'E', 'M', 'GK', 'NW', 'IV', 'FS2', 'REL', 'SP', 'KF', 'NW2'];
+const PFLICHT4 = ['D', 'M', 'NW'];          // je 4 Kurse; Fremdsprache (E oder Spanisch) und GK über altGroups (altGroups)
+const RULE13 = ['D', 'E', 'M', 'NW', 'GK', 'IV', 'BWL', 'VWL', 'FS2', 'REL', 'SP']; // Pflichtgrundfächer: Kurs 13/2-Regel
+
+function getCombo(fr, nr) { return COMBOS[fr].find(c => c[0] === nr); }
+
+function subjName(k, st) {
+  if (k === 'NW') return NWNAMES[st.nw] || 'Naturwissenschaft';
+  if (k === 'NW2') return (NWNAMES[st.nw2] || '2. Naturwissenschaft') + ' (frei gewählt)';
+  if (k === 'FS2') return st.fs2 === 'neu' ? 'Spanisch (Pflicht, neu ab 11)' : 'Spanisch (freiwillig)';
+  if (k === 'KF') return KFNAMES[st.kf] || 'Künstlerisches Fach';
+  if (k === 'REL') return RELNAMES[st.rel] || 'Religion/Ethik';
+  return SUBJ[k].n;
+}
+
+function buildContext(st) {
+  const c = getCombo(st.fr, st.combo);
+  const lf = c[1].slice();
+  const present = new Set([...lf, ...c[2], 'NW', 'REL', 'KF']);
+  if (st.fs2 === 'neu' || st.fs2 === 'fort') present.add('FS2');
+  if (st.nw2 && st.nw2 !== st.nw) present.add('NW2');
+  const subjects = ORDER.filter(k => present.has(k));
+  const eligible = subjects.filter(k => !lf.includes(k) && !['SP', 'KF', 'NW2'].includes(k) && (k !== 'REL' || st.relFull));
+  return { nr: c[0], lf, gf: c[2], subjects, eligible };
+}
+
+function rolesOf(keys) { const r = new Set(); keys.forEach(k => { if (SUBJ[k].role) r.add(SUBJ[k].role); }); return r; }
+/* AbiPrO § 13 Abs. 1: Prüfungsprofile (BGY: Technik ersetzt NW; BWL/VWL/Rel/Eth ersetzen GW; IV ersetzt NW nur im math.-nat. Profil) */
+function profiles(keys) {
+  const r = rolesOf(keys), out = [];
+  if (r.has('M') && (r.has('NW') || r.has('IV')) && r.has('GW') && (r.has('D') || r.has('FS'))) out.push('mathematisch-naturwissenschaftlich');
+  if (r.has('D') && r.has('FS') && r.has('GW') && (r.has('M') || r.has('NW'))) out.push('sprachlich');
+  return out;
+}
+
+function oralOptions(ctx) {
+  const singles = ctx.eligible.filter(k => profiles([...ctx.lf, k]).length);
+  const pairs = [];
+  for (let i = 0; i < ctx.eligible.length; i++) for (let j = i + 1; j < ctx.eligible.length; j++) {
+    const a = ctx.eligible[i], b = ctx.eligible[j];
+    if (singles.includes(a) || singles.includes(b)) continue;
+    if (profiles([...ctx.lf, a, b]).length) pairs.push([a, b]);
+  }
+  return [...singles.map(k => ({ subs: [k], prof: profiles([...ctx.lf, k]) })),
+          ...pairs.map(p => ({ subs: p, prof: profiles([...ctx.lf, ...p]) }))];
+}
+
+/* Wahlpflicht je 4 Kurse: eine Fremdsprache (Englisch oder 2. FS) und – nur Technik – GK oder Religion/Ethik */
+function altGroups(st, ctx, oralSubs) {
+  const pf = [...ctx.lf, ...oralSubs], groups = [];
+  const fs = ['E']; if (ctx.subjects.includes('FS2')) fs.push('FS2');
+  if (!fs.some(k => pf.includes(k))) groups.push({ id: 'FS', members: fs });
+  groups.push({ id: 'GW', members: ['GK'] }); // GK immer alle 4 Kurse (beide Fachrichtungen)
+  return groups;
+}
+function altChoices(st, ctx, oralSubs) {
+  const gs = altGroups(st, ctx, oralSubs); let out = [{}];
+  gs.forEach(g => { out = out.flatMap(a => g.members.map(m => Object.assign({}, a, { [g.id]: m }))); });
+  return out;
+}
+
+/* Einbringungsplan für eine gewählte mündliche Variante */
+function buildPlan(st, ctx, oralSubs, alt) {
+  const jg = JG[st.jg];
+  const pf = [...ctx.lf, ...oralSubs];
+  const groups = altGroups(st, ctx, oralSubs);
+  if (!alt) alt = {}; groups.forEach(g => { if (!alt[g.id]) alt[g.id] = g.members[0]; });
+  const four = new Set(PFLICHT4); groups.forEach(g => four.add(alt[g.id]));
+  const altOf = k => groups.find(g => g.members.includes(k) && g.members.length > 1);
+  const rows = [];
+  for (const k of ctx.subjects) {
+    const row = { key: k, avail: k === 'KF' ? [0, 1] : [0, 1, 2, 3], forced: new Set(), min: 0, max: 4, rule13: false, group: false, kind: 'GF', text: '' };
+    if (ctx.lf.includes(k)) { row.kind = 'LF'; [0, 1, 2, 3].forEach(h => row.forced.add(h)); row.text = 'alle 4 Kurse'; }
+    else if (oralSubs.includes(k)) { row.kind = 'PF'; row.pfNo = 4 + oralSubs.indexOf(k); [0, 1, 2, 3].forEach(h => row.forced.add(h)); row.text = 'alle 4 Kurse'; }
+    else if (four.has(k)) { [0, 1, 2, 3].forEach(h => row.forced.add(h)); const g = altOf(k);
+      if (g) { row.alt = true; row.text = 'Wahlpflicht: alle 4 Kurse in ' + g.members.map(m => subjName(m, st).replace(/ \(.*\)/, '')).join(' oder '); }
+      else row.text = 'alle 4 Kurse (Pflicht)'; }
+    else if (k === 'KF') { row.kind = 'KF'; row.forced.add(0); row.forced.add(1); row.max = 2; row.text = '12/1 und 12/2 (Pflicht)'; }
+    else if (k === 'NW2') { row.kind = 'GFfw'; row.rule13 = jg.oldTwoFS; row.text = jg.oldTwoFS ? 'freiwillig; wenn eingebracht, dann mit 13/2' : 'freiwillig, beliebige Kurse'; }
+    else {
+      row.rule13 = RULE13.includes(k);
+      row.text = 'freiwillig; wenn eingebracht, dann mit 13/2';
+      if (k === 'SP') { row.max = jg.sportMax; row.text = `freiwillig, höchstens ${jg.sportMax} Kurse, dann mit 13/2`; }
+      if (k === 'FS2' && st.fs2 === 'neu') { row.min = 2; row.text = 'mind. 2 Kurse, darunter 13/2; kein Kurs mit 0 Punkten'; }
+      if (k === 'FS2' && st.fs2 === 'fort') { row.kind = 'GFfw'; row.rule13 = jg.oldTwoFS; row.text = jg.oldTwoFS ? 'freiwillig; wenn eingebracht, dann mit 13/2' : 'freiwillig, beliebige Kurse'; }
+      const g = altOf(k); if (g) { row.altOther = true; row.text += ' · oder statt ' + g.members.filter(m => m !== k).map(m => subjName(m, st).replace(/ \(.*\)/, '')).join('/') + ' alle 4 Kurse'; }
+      if ((k === 'BWL' || k === 'VWL') && st.fr === 'W') { row.min = 1; row.text = 'mind. 1 Kurs: 13/2 (Pflicht)'; }
+    }
+    if (k === 'SP' && row.kind === 'LF' && st.spSingle) row.noDouble = true;
+    rows.push(row);
+  }
+  // Pflichtkurs 2. FS / 2. NW / IV (AbiPrO § 10 Abs. 2 Nr. 1 f, VV BGY)
+  let group = null;
+  if (st.fs2 === 'fort' || st.fs2 === 'nicht') {
+    const members = rows.filter(r => (r.key === 'IV') || (r.key === 'NW2') || (r.key === 'FS2' && st.fs2 === 'fort'));
+    const auto = members.some(r => r.forced.size > 0);
+    if (!auto) {
+      if (members.length === 1) { members[0].min = Math.max(members[0].min, 1); members[0].text = 'Pflicht: Kurs 13/2 (Ersatz für Spanisch)' + (members[0].altOther ? ' · oder statt Englisch alle 4 Kurse' : ''); }
+      else { members.forEach(r => { r.group = true; r.text = 'Pflicht: mind. 1 Kurs aus ' + members.map(m => SUBJ[m.key].s).join(' oder ') + (r.rule13 ? ' (mit 13/2)' : '') + (r.altOther ? ' · oder statt Englisch alle 4 Kurse' : ''); }); group = members.map(r => r.key); }
+    }
+  }
+  // Mindestkurse mit 13/2-Regel: 13/2 ist dann zwingend
+  rows.forEach(r => { if (r.min > 0 && r.rule13) r.forced.add(3); });
+  const forcedN = rows.reduce((a, r) => a + r.forced.size, 0);
+  const extraMin = rows.reduce((a, r) => a + Math.max(0, r.min - r.forced.size), 0);
+  const free = 36 - forcedN - extraMin - (group ? 1 : 0);
+  return { rows, group, forcedN, free, pf, oralSubs, alt, groups };
+}
+
+/* Optimierer Block I */
+function optimize(plan, grades, est) {
+  const val = (k, h) => {
+    const g = grades[k] && grades[k][h];
+    if (g !== undefined && g !== null && g !== '') return +g;
+    if (est !== '' && est !== null && est !== undefined && !isNaN(+est)) return +est;
+    return null;
+  };
+  const missing = [], zeros = [];
+  let forcedPts = 0, forcedU = 0;
+  const chosen = {};
+  plan.rows.forEach(r => {
+    chosen[r.key] = new Set(r.forced);
+    r.forced.forEach(h => {
+      const v = val(r.key, h);
+      if (v === null) missing.push([r.key, h]);
+      else { if (v === 0) zeros.push([r.key, h]); forcedPts += v; if (v < 5) forcedU++; }
+    });
+  });
+  if (missing.length) return { status: 'missing', missing, zeros };
+  const R = 36 - plan.forcedN;
+  // Optionen je Fach
+  const opts = plan.rows.map(r => {
+    const fN = r.forced.size;
+    let pool = r.avail.filter(h => !r.forced.has(h)).map(h => ({ h, v: val(r.key, h) })).filter(o => o.v !== null && o.v > 0);
+    const kmin = Math.max(0, r.min - fN), kmax = Math.min(r.max - fN, pool.length);
+    const list = [];
+    const need13 = r.rule13 && !r.forced.has(3) && fN === 0;
+    const has13 = pool.find(o => o.h === 3);
+    for (let k = kmin; k <= kmax; k++) {
+      let pick;
+      if (k === 0) pick = [];
+      else if (need13) { if (!has13) continue; pick = [has13, ...pool.filter(o => o.h !== 3).sort((a, b) => b.v - a.v).slice(0, k - 1)]; if (pick.length < k) continue; }
+      else pick = pool.slice().sort((a, b) => b.v - a.v).slice(0, k);
+      list.push({ k, pts: pick.reduce((a, o) => a + o.v, 0), u: pick.filter(o => o.v < 5).length, hs: pick.map(o => o.h), g: r.group && (k > 0) });
+    }
+    return list;
+  });
+  // DP
+  let dp = new Map(); dp.set(`0|0|${plan.group ? 0 : 1}`, { pts: 0, ch: [] });
+  for (let i = 0; i < opts.length; i++) {
+    const nd = new Map();
+    for (const [key, s] of dp) {
+      const [sl, u, g] = key.split('|').map(Number);
+      for (const o of opts[i]) {
+        const ns = sl + o.k; if (ns > R) continue;
+        const nk = `${ns}|${u + o.u}|${(g || o.g) ? 1 : 0}`;
+        const cand = { pts: s.pts + o.pts, ch: s.ch.concat([o]) };
+        const cur = nd.get(nk);
+        if (!cur || cur.pts < cand.pts) nd.set(nk, cand);
+      }
+    }
+    dp = nd;
+  }
+  let best = null, bestU = null, fallback = null;
+  for (const [key, s] of dp) {
+    const [sl, u, g] = key.split('|').map(Number);
+    if (sl !== R || g !== 1) continue;
+    const tu = u + forcedU;
+    if (tu <= 7) { if (!best || s.pts > best.pts) { best = s; bestU = tu; } }
+    else if (!fallback || tu < fallback.tu || (tu === fallback.tu && s.pts > fallback.s.pts)) fallback = { s, tu };
+  }
+  let warnU = false;
+  if (!best && fallback) { best = fallback.s; bestU = fallback.tu; warnU = true; }
+  if (!best) return { status: 'infeasible', zeros };
+  best.ch.forEach((o, i) => o.hs.forEach(h => chosen[plan.rows[i].key].add(h)));
+  let sum = forcedPts + best.pts;
+  // Doppelte Wertung: 2 LF mit höchster Punktsumme
+  const lfRows = plan.rows.filter(r => r.kind === 'LF' && !r.noDouble);
+  const lfSums = lfRows.map(r => ({ key: r.key, s: [0, 1, 2, 3].reduce((a, h) => a + val(r.key, h), 0) })).sort((a, b) => b.s - a.s);
+  const doubled = lfSums.slice(0, 2);
+  const P = sum + doubled.reduce((a, d) => a + d.s, 0);
+  const BI = Math.round(P * 40 / 44);
+  const problems = [];
+  if (zeros.length) problems.push('Ein Pflichtkurs hat 0 Punkte. Kurse mit 0 Punkten dürfen nicht eingebracht werden: Block I ist so nicht erreicht.');
+  if (warnU) problems.push(`Es lassen sich nicht höchstens 7 Kurse unter 5 Punkten einbringen (bestenfalls ${bestU}).`);
+  if (BI < 200) problems.push('Block I liegt unter 200 Punkten.');
+  return { status: 'ok', chosen, doubled: doubled.map(d => d.key), P, BI, u5: bestU, sum36: sum, problems, zeros, ok: problems.length === 0 };
+}
+
+/* Block II und Abiturnote */
+function blockII(nPF, results) { // results: Array von Punktwerten (bereits 2:1 verrechnet, ggf. Brüche)
+  const factor = nPF === 4 ? 5 : 4;
+  const raw = results.reduce((a, v) => a + v, 0) * factor;
+  const total = Math.floor(raw + 1e-9);
+  const ge5 = results.filter(v => v >= 5).length;
+  const need = nPF === 4 ? 2 : 3;
+  const problems = [];
+  if (total < 100) problems.push('Block II liegt unter 100 Punkten.');
+  if (ge5 < need) problems.push(`Mindestens ${need} Prüfungsfächer brauchen je 5 Punkte (einfach gewertet).`);
+  return { total, factor, ok: problems.length === 0, problems, ge5, need };
+}
+function abiNote(total) {
+  if (total >= 823) return 1.0;
+  const n = 17 / 3 - total / 180;
+  return Math.min(4.0, Math.floor(n * 10 + 1e-9) / 10);
+}
+
+function plansFor(st, ctx, subs) { return altChoices(st, ctx, subs).map(a => buildPlan(st, ctx, subs, a)); }
+function validOptions(st, ctx) {
+  return oralOptions(ctx).map(o => { const f = Math.max(...plansFor(st, ctx, o.subs).map(p => p.free)); return Object.assign(o, { free: f, possible: f >= 0 }); });
+}
+/* beste Einbringung über alle Wahlpflicht-Alternativen */
+function optimizeBest(st, ctx, subs, grades, est) {
+  let best = null;
+  for (const plan of plansFor(st, ctx, subs)) {
+    if (plan.free < 0) continue;
+    const r = optimize(plan, grades, est); r.plan = plan;
+    if (!best) { best = r; continue; }
+    const rank = x => x.status === 'ok' ? (x.ok ? 3 : 2) : (x.status === 'missing' ? 1 : 0);
+    if (rank(r) > rank(best) || (rank(r) === rank(best) && r.status === 'ok' && r.BI > best.BI) ||
+        (rank(r) === rank(best) && r.status === 'missing' && r.missing.length < best.missing.length)) best = r;
+  }
+  return best;
+}
+
+if (typeof module !== 'undefined') module.exports = { optimizeBest, plansFor, validOptions, SUBJ, COMBOS, JG, buildContext, oralOptions, buildPlan, optimize, blockII, abiNote, profiles, subjName };
+
+</script>
+<script>
+const $ = id => document.getElementById(id);
+
+/* Prognose: fehlende Halbjahre mit dem Fachschnitt (sonst Gesamtschnitt) bzw. im besten Fall mit 15 Punkten füllen */
+const has = v => v !== null && v !== undefined && v !== '';
+function projections(ctx) {
+  const all = [];
+  ctx.subjects.forEach(k => (st.grades[k] || []).forEach(v => { if (has(v)) all.push(+v); }));
+  if (!all.length) return null;
+  const overall = all.reduce((a, b) => a + b, 0) / all.length;
+  const avg = {}, filled = {}, best = {}; let missing = 0, total = 0;
+  ctx.subjects.forEach(k => {
+    const g = st.grades[k] || []; const vs = g.filter(has).map(Number);
+    avg[k] = vs.length ? vs.reduce((a, b) => a + b, 0) / vs.length : overall;
+    const avail = k === 'KF' ? [0, 1] : [0, 1, 2, 3];
+    filled[k] = [0, 1, 2, 3].map(h => has(g[h]) ? +g[h] : (avail.includes(h) ? Math.round(avg[k]) : null));
+    best[k] = [0, 1, 2, 3].map(h => has(g[h]) ? +g[h] : (avail.includes(h) ? 15 : null));
+    avail.forEach(h => { total++; if (!has(g[h])) missing++; });
+  });
+  const stand = [0, 1, 2, 3].filter(h => ctx.subjects.some(k => has((st.grades[k] || [])[h])));
+  return { overall, avg, filled, best, missing, total, stand };
+}
+
+const DEF = { jg: 2025, fr: 'T', combo: 'T1', nw: 'CH', nw2: '', kf: 'BK', rel: 'EV', fs2: 'neu', relFull: true, spSingle: false, oral: '', vol5: '', gradesOn: false, grades: {}, b2: {} };
+let st = Object.assign({}, DEF);
+try { const s = JSON.parse(localStorage.getItem('abiplaner-bgy') || 'null'); if (s) st = Object.assign({}, DEF, s); } catch (e) {}
+function save() { try { localStorage.setItem('abiplaner-bgy', JSON.stringify(st)); } catch (e) {} }
+const nm = k => subjName(k, st);
+const fmtList = ks => ks.map(nm).join(' + ');
+const ROLE = { LF: 'Leistungsfach · schriftlich', GF: 'Grundfach', KF: 'Grundfach (nur 12)', GFfw: 'frei gewählt' };
+
+function syncControls() {
+  $('jg').value = st.jg; $('fr').value = st.fr;
+  $('combo').innerHTML = COMBOS[st.fr].map(c => `<option value="${c[0]}">${c[0]} · ${c[1].map(k => SUBJ[k].n).join(' · ')}</option>`).join('');
+  if (!getCombo(st.fr, st.combo)) st.combo = COMBOS[st.fr][0][0];
+  $('combo').value = st.combo;
+  if (!NWOPT[st.fr].includes(st.nw)) st.nw = 'CH';
+  $('nw').innerHTML = NWOPT[st.fr].map(k => `<option value="${k}">${NWNAMES[k]}</option>`).join(''); $('nw').value = st.nw;
+  st.nw2 = '';
+  $('kf').value = st.kf; $('rel').value = st.rel; $('fs2-' + st.fs2).checked = true;
+  st.relFull = true; $('spSingle').checked = st.spSingle; $('gradesOn').checked = st.gradesOn;
+  $('spField').style.display = getCombo(st.fr, st.combo)[1].includes('SP') ? '' : 'none';
+}
+
+function jgInfo() {
+  const j = JG[st.jg];
+  const neu = st.jg >= 2025;
+  $('jginfo').innerHTML = `<b>Für dich gilt (Eintritt ${st.jg}, Abitur ${j.abi}${st.jg == 2023 ? ' bzw. Wiederholung' : ''}):</b><ul>
+    <li>LVO über das berufliche Gymnasium in der Fassung der ${j.tafel} – Fächerkombinationstafel ${neu ? 'ab 1.8.2025' : 'ab 1.8.2023'}.</li>
+    <li>Sport: höchstens <b>${j.sportMax} Kurse</b> in Block I${neu ? ' (neue Verwaltungsvorschrift 2025)' : ''}.</li>
+    <li>Fremdsprachenpflicht aus Klasse 7–10 erfüllt: mindestens 1 Kurs Spanisch (wenn freiwillig belegt) oder der Kurs 13/2 in IV.</li></ul>`;
+}
+
+function currentOption(opts) {
+  const poss = opts.filter(o => o.possible);
+  let o = poss.find(x => x.subs.join('+') === st.oral);
+  if (!o) { o = poss[0]; st.oral = o ? o.subs.join('+') : ''; }
+  return o;
+}
+function subsFor(ctx, opt) {
+  return opt.subs.slice();
+}
+function planFor(ctx, opt) { // Ansicht ohne Noten: Alternative mit den meisten freien Kursen
+  return plansFor(st, ctx, subsFor(ctx, opt)).sort((a, b) => b.free - a.free)[0];
+}
+
+function render() {
+  const ae = document.activeElement, aid = ae && ae.id;
+  syncControls(); jgInfo();
+  const ctx = buildContext(st);
+  const opts = validOptions(st, ctx);
+  const cur = currentOption(opts);
+  const anySingle = opts.some(o => o.possible && o.subs.length === 1);
+  $('oralLead').textContent = `Deine Leistungsfächer: ${fmtList(ctx.lf)} (schriftlich). ` + (anySingle
+    ? 'Mit einem passenden mündlichen Fach ist ein Prüfungsprofil vollständig: du hast 4 Prüfungsfächer. Varianten mit zwei Fächern bedeuten 5 Prüfungsfächer.'
+    : 'Mit deiner Kombination reicht ein mündliches Fach nicht für ein vollständiges Profil: du gehst in zwei Fächern in die mündliche Prüfung (5 Prüfungsfächer).');
+  // Ergebnisse je Variante (mit Noten)
+  const results = {};
+  const pr = st.gradesOn ? projections(ctx) : null;
+  if (pr) opts.filter(o => o.possible).forEach(o => { results[o.subs.join('+')] = optimizeBest(st, ctx, subsFor(ctx, o), pr.filled, ''); });
+  let bestKey = null, bestBI = -1;
+  Object.entries(results).forEach(([k, r]) => { if (r.status === 'ok' && r.BI > bestBI && r.ok) { bestBI = r.BI; bestKey = k; } });
+  $('opts').innerHTML = opts.map((o, i) => {
+    const key = o.subs.join('+'); const r = results[key];
+    const lab = String.fromCharCode(65 + i);
+    if (!o.possible) return `<div class="opt off" aria-disabled="true"><span class="tag">Variante ${lab} · nicht möglich</span><span class="subs">${fmtList(o.subs)}</span><span class="meta">Es kämen mehr als 36 Pflichtkurse zusammen.</span></div>`;
+    let score = '';
+    if (r && r.status === 'ok') score = `<span class="score">Block I${pr.missing ? ' (Prognose)' : ''}: ${r.BI} P. ${key === bestKey ? '<span class="badge ok">beste Wahl</span>' : ''}</span>`;
+    return `<button type="button" class="opt" id="opt-${key}" data-key="${key}" aria-pressed="${key === st.oral}"><span class="tag">Variante ${lab} · ${o.subs.length + 3} Prüfungsfächer</span><span class="subs">${fmtList(o.subs)}</span><span class="meta">Profil: ${o.prof.join(' / ')} · ${o.free} Kurse frei wählbar</span>${score}</button>`;
+  }).join('');
+  document.querySelectorAll('.opt[data-key]').forEach(b => b.onclick = () => { st.oral = b.dataset.key; save(); render(); });
+  if (!cur) { $('plan').innerHTML = ''; return; }
+  let plan = planFor(ctx, cur);
+  const res = pr ? optimizeBest(st, ctx, subsFor(ctx, cur), pr.filled, '') : null;
+  if (res && res.plan) plan = res.plan;
+  renderSummary(plan, res, pr);
+  renderTable(plan, res, pr);
+  const b2 = renderB2(ctx, plan, res, pr);
+  renderForecast(ctx, opts, res, pr, b2);
+  if (aid && $(aid)) { const el = $(aid); el.focus(); if (el.setSelectionRange && el.type === 'text') { try { el.setSelectionRange(el.value.length, el.value.length); } catch (e) {} } }
+}
+
+function renderSummary(plan, res, pr) {
+  const mins = plan.rows.reduce((a, r) => a + Math.max(0, r.min - r.forced.size), 0) + (plan.group ? 1 : 0);
+  let h = `<div class="tile"><span class="k">Pflichtkurse</span><span class="v">${plan.forcedN + mins}</span><span class="s">von 36 sind festgelegt</span></div>
+    <div class="tile"><span class="k">Frei wählbar</span><span class="v">${plan.free}</span><span class="s">Kurse nach deiner Wahl</span></div>
+    <div class="tile"><span class="k">Prüfungsfächer</span><span class="v">${plan.pf.length}</span><span class="s">${plan.oralSubs.map(nm).join(', ')} mündlich</span></div>`;
+  let msgs = '';
+  if (st.gradesOn && !pr) msgs += `<div class="msg info">Trage die Punkte der Halbjahre ein, die du schon hast. Fehlende Halbjahre rechnet der Planer mit deinem bisherigen Schnitt im jeweiligen Fach weiter (grau angezeigt).</div>`;
+  if (res && res.status === 'ok') {
+    h += `<div class="tile ${res.ok ? 'good' : 'badt'}"><span class="k">Block I${pr.missing ? ' · Prognose' : ''}</span><span class="v">${res.BI}</span><span class="s">${res.u5} Kurse unter 5 P. (max. 7)</span></div>`;
+    res.problems.forEach(p => msgs += `<div class="msg bad">${p}</div>`);
+    msgs += `<div class="msg info">Doppelt gewertet: ${res.doubled.map(nm).join(' und ')}. Punktsumme mit Doppelwertung ${res.P} × 40/44 = ${res.BI} Punkte.${pr.missing ? ` ${pr.missing} von ${pr.total} Kursnoten sind noch Prognose (grau).` : ''}</div>`;
+  } else if (res) msgs += `<div class="msg bad">Mit diesen Noten lassen sich keine 36 Kurse regelgerecht einbringen. Prüfe 0-Punkte-Kurse und den Kurs 13/2.</div>`;
+  $('summary').innerHTML = h; $('messages').innerHTML = msgs;
+  $('gradeTools').innerHTML = st.gradesOn ? `<button type="button" class="btn" id="example">Beispielnoten</button><button type="button" class="btn" id="clear">Noten löschen</button>` : '';
+  if (st.gradesOn) {
+    $('example').onclick = () => { const ctx = buildContext(st); const seed = [11, 9, 12, 8, 10, 7, 13, 6, 9, 11, 4, 10, 8, 14, 12, 5, 9]; st.grades = {}; ctx.subjects.forEach((k, i) => { st.grades[k] = [0, 1, 2, 3].map(h => h < 3 ? seed[(i * 5 + h * 3 + i * h) % seed.length] : null); }); save(); render(); };
+    $('clear').onclick = () => { st.grades = {}; st.b2 = {}; save(); render(); };
+  }
+}
+
+function renderTable(plan, res, pr) {
+  const g = st.gradesOn;
+  let h = `<thead><tr><th>Fach</th><th>Rolle</th>${HJ.map(x => `<th style="text-align:center">${x}</th>`).join('')}<th>Regel</th></tr></thead><tbody>`;
+  plan.rows.forEach(r => {
+    const role = r.kind === 'PF' ? `${r.pfNo}. Prüfungsfach · mündlich` : ROLE[r.kind];
+    const dbl = res && res.status === 'ok' && res.doubled.includes(r.key) ? '<span class="x2" title="doppelt gewertet">×2</span>' : '';
+    h += `<tr><td class="fach">${nm(r.key)}${dbl}</td><td><span class="role ${r.kind}">${role}</span></td>`;
+    for (let i = 0; i < 4; i++) {
+      if (!r.avail.includes(i)) { h += `<td class="c na">—</td>`; continue; }
+      const must = r.forced.has(i);
+      if (!g) {
+        const altC = r.altOther;
+        const txt = (must || altC) ? ((r.alt || altC) ? 'Wahlpflicht' : 'Pflicht') : (r.rule13 && i === 3 ? 'wählbar*' : 'wählbar');
+        h += `<td class="c ${must || altC ? 'must' : ''} ${altC && !must ? 'alt' : ''}">${txt}</td>`;
+      } else {
+        const v = (st.grades[r.key] || [])[i]; const val = v === undefined || v === null ? '' : v;
+        let cls = must ? 'must ' : '';
+        if (res && res.status === 'ok') cls += res.chosen[r.key].has(i) ? 'in' : 'out';
+        if (val === 0 || val === '0') cls += ' zero';
+        const ph = pr && val === '' && pr.filled[r.key] && pr.filled[r.key][i] !== null ? pr.filled[r.key][i] : '';
+        h += `<td class="c ${cls}"><input type="text" inputmode="numeric" maxlength="2" id="g-${r.key}-${i}" aria-label="${nm(r.key)} ${HJ[i]}" value="${val}" placeholder="${ph}"></td>`;
+      }
+    }
+    h += `<td class="rule">${r.text}</td></tr>`;
+  });
+  $('plan').innerHTML = h + '</tbody>';
+  document.querySelectorAll('#plan input').forEach(inp => inp.oninput = e => {
+    const [, k, i] = e.target.id.split('-'); const raw = e.target.value.replace(/\D/g, '');
+    st.grades[k] = st.grades[k] || [null, null, null, null];
+    st.grades[k][+i] = raw === '' ? null : Math.min(15, +raw);
+    save(); render();
+  });
+  $('legend').innerHTML = g
+    ? `<span><i class="sw" style="background:var(--accent);border-radius:50%;width:8px;height:8px"></i>Pflichtkurs</span><span><i class="sw" style="background:var(--sel)"></i>wird eingebracht (beste Kombination)</span><span><b style="font-family:var(--font-mono)">×2</b> Leistungsfach doppelt gewertet</span><span><b style="color:var(--muted);font-family:var(--font-mono)">9</b> grau = Prognose aus deinem Fachschnitt</span>`
+    : `<span><i class="sw" style="background:var(--accent);border-radius:50%;width:8px;height:8px"></i>Pflicht: muss eingebracht werden</span><span>Wahlpflicht: eines der beiden Fächer mit allen 4 Kursen (bei Noten wählt der Planer das günstigere)</span><span>wählbar: kann eingebracht werden · * bei Pflicht-Grundfächern gehört 13/2 immer dazu, sobald du einen Kurs einbringst</span>`;
+}
+
+function renderB2(ctx, plan, res, pr) {
+  const pf = plan.pf; const nPF = pf.length;
+  st.b2 = st.b2 || {};
+  const num = v => has(v) ? +v : null;
+  const projOf = k => pr ? Math.round(pr.avg[k]) : null;
+  let h = '';
+  pf.forEach((k, idx) => {
+    const isLF = idx < 3; const w = st.b2['w-' + k] ?? ''; const z = st.b2['z-' + k] ?? '';
+    const ph = projOf(k) ?? '';
+    h += `<div class="card"><b>${nm(k)}</b><div class="row"><label for="b2w-${k}">${isLF ? 'schriftlich' : 'mündlich'}</label><input type="text" inputmode="numeric" maxlength="2" id="b2w-${k}" value="${w}" placeholder="${ph}"></div>`;
+    if (isLF) h += `<div class="row"><label for="b2z-${k}">mündl. Zusatz (optional)</label><input type="text" inputmode="numeric" maxlength="2" id="b2z-${k}" value="${z}"></div>`;
+    h += `</div>`;
+  });
+  $('b2').innerHTML = h;
+  document.querySelectorAll('#b2 input').forEach(inp => inp.oninput = e => {
+    const [p, k] = e.target.id.split('-'); const raw = e.target.value.replace(/\D/g, '');
+    st.b2[(p === 'b2w' ? 'w-' : 'z-') + k] = raw === '' ? '' : String(Math.min(15, +raw)); save(); render();
+  });
+  let projected = 0;
+  const vals = pf.map((k, idx) => {
+    let w = num(st.b2['w-' + k]);
+    if (w === null) { w = projOf(k); if (w !== null) projected++; }
+    if (w === null) return null;
+    const z = idx < 3 ? num(st.b2['z-' + k]) : null;
+    return z === null ? w : (2 * w + z) / 3;
+  });
+  let s = '', out = null;
+  if (vals.every(v => v !== null)) {
+    const b = blockII(nPF, vals); out = { b, projected };
+    const tag = projected ? ' · Prognose' : '';
+    s += `<div class="tile ${b.ok ? 'good' : 'badt'}"><span class="k">Block II${tag}</span><span class="v">${b.total}</span><span class="s">Summe × ${b.factor} · ${b.ge5} von ${nPF} Fächern ≥ 5 P.</span></div>`;
+    if (res && res.status === 'ok') {
+      const tot = res.BI + b.total; const pass = res.ok && b.ok;
+      const tag2 = (projected || pr.missing) ? ' · Prognose' : '';
+      s += `<div class="tile ${pass ? 'good' : 'badt'}"><span class="k">Gesamt${tag2}</span><span class="v">${tot}</span><span class="s">von 900 Punkten</span></div>`;
+      s += `<div class="tile ${pass ? 'good' : 'badt'}"><span class="k">Abiturnote${tag2}</span><span class="v">${pass ? abiNote(tot).toFixed(1).replace('.', ',') : '–'}</span><span class="s">${pass ? 'bestanden' : 'nicht bestanden'}</span></div>`;
+      out.tot = tot; out.pass = pass;
+    }
+    b.problems.forEach(p => s += `<div class="msg bad">${p}</div>`);
+    if (projected) s += `<div class="msg info">${projected} Prüfungsergebnis${projected > 1 ? 'se' : ''} (grau) mit deinem bisherigen Kursschnitt im Fach angenommen.</div>`;
+  } else s = `<div class="msg info">Trage Kursnoten in Abschnitt 03 oder hier Prüfungsergebnisse ein, um Block II und die Abiturnote zu sehen.</div>`;
+  $('b2sum').innerHTML = s;
+  return out;
+}
+
+/* Prognose: Eintritt 13/2, Zulassung, Abiturnote */
+function renderForecast(ctx, opts, res, pr, b2) {
+  const el = $('forecast');
+  if (!st.gradesOn) { el.innerHTML = `<div class="msg info">Setze in Abschnitt 03 das Häkchen „Noten eingeben“ und trage deine bisherigen Halbjahre ein. Dann siehst du hier, ob du ins Prüfungshalbjahr 13/2 und zur Abiturprüfung zugelassen wirst und welche Abiturnote mit deinem bisherigen Schnitt herauskäme.</div>`; return; }
+  if (!pr) { el.innerHTML = `<div class="msg info">Noch keine Noten eingetragen.</div>`; return; }
+  const standTxt = pr.stand.length ? 'Noten bis ' + HJ[Math.max(...pr.stand)] : '';
+  // 1) Eintritt in 13/2: Block I im besten Fall noch erreichbar (fehlende Kurse = 15 P.), über alle Varianten
+  let reach = null;
+  opts.filter(o => o.possible).forEach(o => {
+    const r = optimizeBest(st, ctx, o.subs, pr.best, '');
+    if (r && r.status === 'ok' && (!reach || (r.ok && !reach.ok) || (r.ok === reach.ok && r.BI > reach.BI))) reach = Object.assign(r, { o });
+  });
+  const okEntry = reach && reach.ok;
+  const noFuture = pr.missing === 0;
+  const t1 = `<div class="tile ${okEntry ? 'good' : 'badt'}"><span class="k">Eintritt in 13/2</span><span class="v">${okEntry ? 'möglich' : 'gefährdet'}</span><span class="s">${okEntry ? (noFuture ? 'Block I ist erreicht' : 'Block I ist rechnerisch noch erreichbar') : 'Block I ist rechnerisch nicht mehr erreichbar'}</span></div>`;
+  // 2) Zulassung zur Abiturprüfung: Block I mit Schnitt-Prognose
+  const okAdm = res && res.status === 'ok' && res.ok;
+  const t2 = `<div class="tile ${okAdm ? 'good' : 'badt'}"><span class="k">Zulassung zur Prüfung</span><span class="v">${okAdm ? 'ja' : 'nein'}</span><span class="s">${res && res.status === 'ok' ? 'Block I ' + res.BI + ' P.' + (pr.missing ? ' bei gleichem Schnitt' : '') : 'keine regelgerechte Einbringung'}</span></div>`;
+  // 3) Abiturnote
+  const note = b2 && b2.pass ? abiNote(b2.tot).toFixed(1).replace('.', ',') : '–';
+  const t3 = `<div class="tile ${b2 && b2.pass ? 'good' : 'badt'}"><span class="k">Abiturnote</span><span class="v">${note}</span><span class="s">${b2 && b2.tot ? b2.tot + ' von 900 Punkten' : 'noch nicht berechenbar'}</span></div>`;
+  let msg = `<div class="msg info">${standTxt}. ${pr.missing ? `Fehlende Halbjahre und Prüfungen sind mit deinem bisherigen Schnitt im jeweiligen Fach weitergerechnet (Gesamtschnitt bisher ${pr.overall.toFixed(1).replace('.', ',')} Punkte).` : 'Alle Kursnoten sind eingetragen.'} Für den Eintritt in 13/2 prüft der Planer, ob du Block I selbst im besten Fall noch erreichen kannst; die mündlichen Fächer legst du erst nach dem Zeugnis 13/2 fest.</div>`;
+  if (!okEntry) msg += `<div class="msg bad">Auch mit 15 Punkten in allen fehlenden Kursen sind die Bedingungen für Block I nicht erfüllbar (z. B. ein Pflichtkurs mit 0 Punkten oder zu viele Kurse unter 5 Punkten). Sprich mit der Oberstufenleitung.</div>`;
+  else if (!okAdm) msg += `<div class="msg bad">Mit deinem bisherigen Schnitt würdest du Block I nicht erreichen. Du brauchst in den verbleibenden Halbjahren bessere Ergebnisse.</div>`;
+  el.innerHTML = `<div class="summary">${t1}${t2}${t3}</div>${msg}`;
+}
+
+// Steuerelemente
+$('jg').onchange = e => { st.jg = +e.target.value; save(); render(); };
+$('fr').onchange = e => { st.fr = e.target.value; st.combo = COMBOS[st.fr][0][0]; st.oral = ''; save(); render(); };
+$('combo').onchange = e => { st.combo = e.target.value; st.oral = ''; save(); render(); };
+$('nw').onchange = e => { st.nw = e.target.value; save(); render(); };
+$('kf').onchange = e => { st.kf = e.target.value; save(); render(); };
+$('rel').onchange = e => { st.rel = e.target.value; save(); render(); };
+document.querySelectorAll('input[name=fs2]').forEach(r => r.onchange = e => { st.fs2 = e.target.value; save(); render(); });
+$('spSingle').onchange = e => { st.spSingle = e.target.checked; save(); render(); };
+$('gradesOn').onchange = e => { st.gradesOn = e.target.checked; save(); render(); };
+
+// Sichern und Laden
+const APPID = 'abiplaner-bgy';
+const exportJSON = () => JSON.stringify({ app: APPID, v: 1, gespeichert: new Date().toISOString(), st });
+const toCode = () => btoa(unescape(encodeURIComponent(exportJSON())));
+function importData(obj) {
+  if (!obj || obj.app !== APPID || !obj.st) throw new Error('kein Abitur-Planer-Stand');
+  st = Object.assign({}, DEF, obj.st); save(); render();
+  const d = obj.gespeichert ? new Date(obj.gespeichert).toLocaleDateString('de-DE') : '';
+  $('saveMsg').textContent = 'Stand geladen' + (d ? ' (gespeichert am ' + d + ')' : '') + '.';
+}
+$('saveFile').onclick = () => {
+  try {
+    const blob = new Blob([exportJSON()], { type: 'application/json' });
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+    a.download = 'Abitur-Planer_Eingaben_' + new Date().toISOString().slice(0, 10) + '.json';
+    document.body.appendChild(a); a.click(); a.remove();
+    $('saveMsg').textContent = 'Datei wird heruntergeladen. Falls nichts passiert, nutze den Speichercode.';
+  } catch (e) { $('saveMsg').textContent = 'Speichern als Datei geht hier nicht. Nutze den Speichercode.'; }
+};
+$('loadFileBtn').onclick = () => $('loadFile').click();
+$('loadFile').onchange = e => {
+  const f = e.target.files[0]; if (!f) return;
+  const r = new FileReader();
+  r.onload = () => { try { importData(JSON.parse(r.result)); } catch (err) { $('saveMsg').textContent = 'Die Datei konnte nicht gelesen werden. Wähle eine mit „Als Datei speichern“ erstellte Datei.'; } e.target.value = ''; };
+  r.readAsText(f);
+};
+$('copyCode').onclick = async () => {
+  const code = toCode(); $('codeArea').hidden = false; $('codeText').value = code;
+  try { await navigator.clipboard.writeText(code); $('saveMsg').textContent = 'Speichercode kopiert. Füge ihn z. B. in deine Notizen ein.'; }
+  catch (e) { $('codeText').select(); $('saveMsg').textContent = 'Markiere den Code im Feld und kopiere ihn selbst.'; }
+};
+$('pasteCode').onclick = () => { $('codeArea').hidden = false; $('codeText').value = ''; $('codeText').focus(); $('saveMsg').textContent = 'Füge deinen Speichercode ein und klicke auf „Speichercode übernehmen“.'; };
+$('applyCode').onclick = () => {
+  try { importData(JSON.parse(decodeURIComponent(escape(atob($('codeText').value.trim()))))); $('codeArea').hidden = true; }
+  catch (e) { $('saveMsg').textContent = 'Der Speichercode ist ungültig. Kopiere ihn vollständig.'; }
+};
+$('closeCode').onclick = () => { $('codeArea').hidden = true; };
+render();
+</script>
+</body>
+</html>
