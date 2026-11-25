@@ -150,9 +150,6 @@ td.rule{font-size:13px;color:var(--muted);min-width:200px}
         <label><input type="radio" name="fs2" id="fs2-fort" value="fort"> Fremdsprachenpflicht aus Klasse 7–10 erfüllt, Spanisch belege ich in 12/13 freiwillig</label>
         <label><input type="radio" name="fs2" id="fs2-nicht" value="nicht"> Fremdsprachenpflicht aus Klasse 7–10 erfüllt, kein Spanisch in 12/13</label>
       </div></div>
-    <div class="field" id="spField"><span class="lbl">Sport-Leistungsfach</span>
-      <label class="check" id="spSingleWrap"><input type="checkbox" id="spSingle"> Sport-Leistungsfach zählt nur einfach (Theorie/Praxis mehrfach unter 4 Punkten)</label>
-    </div>
   </div>
   <div class="jginfo" id="jginfo"></div>
   <div class="card savebox">
@@ -387,7 +384,6 @@ function buildPlan(st, ctx, oralSubs, alt) {
       const g = altOf(k); if (g) { row.altOther = true; row.text += ' · oder statt ' + g.members.filter(m => m !== k).map(m => subjName(m, st).replace(/ \(.*\)/, '')).join('/') + ' alle 4 Kurse'; }
       if ((k === 'BWL' || k === 'VWL') && st.fr === 'W') { row.min = 1; row.text = 'mind. 1 Kurs: 13/2 (Pflicht)'; }
     }
-    if (k === 'SP' && row.kind === 'LF' && st.spSingle) row.noDouble = true;
     rows.push(row);
   }
   // Pflichtkurs 2. FS / 2. NW / IV (AbiPrO § 10 Abs. 2 Nr. 1 f, VV BGY)
@@ -553,6 +549,7 @@ function projections(ctx) {
 const DEF = { jg: 2025, fr: 'T', combo: 'T1', nw: 'CH', nw2: '', kf: 'BK', rel: 'EV', fs2: 'neu', relFull: true, spSingle: false, oral: '', vol5: '', gradesOn: false, grades: {}, b2: {} };
 let st = Object.assign({}, DEF);
 try { const s = JSON.parse(localStorage.getItem('abiplaner-bgy') || 'null'); if (s) st = Object.assign({}, DEF, s); } catch (e) {}
+st.spSingle = false;
 function save() { try { localStorage.setItem('abiplaner-bgy', JSON.stringify(st)); } catch (e) {} }
 const nm = k => subjName(k, st);
 const fmtList = ks => ks.map(nm).join(' + ');
@@ -567,8 +564,7 @@ function syncControls() {
   $('nw').innerHTML = NWOPT[st.fr].map(k => `<option value="${k}">${NWNAMES[k]}</option>`).join(''); $('nw').value = st.nw;
   st.nw2 = '';
   $('kf').value = st.kf; $('rel').value = st.rel; $('fs2-' + st.fs2).checked = true;
-  st.relFull = true; $('spSingle').checked = st.spSingle; $('gradesOn').checked = st.gradesOn;
-  $('spField').style.display = getCombo(st.fr, st.combo)[1].includes('SP') ? '' : 'none';
+  st.relFull = true; $('gradesOn').checked = st.gradesOn;
 }
 
 function jgInfo() {
@@ -766,7 +762,6 @@ $('nw').onchange = e => { st.nw = e.target.value; save(); render(); };
 $('kf').onchange = e => { st.kf = e.target.value; save(); render(); };
 $('rel').onchange = e => { st.rel = e.target.value; save(); render(); };
 document.querySelectorAll('input[name=fs2]').forEach(r => r.onchange = e => { st.fs2 = e.target.value; save(); render(); });
-$('spSingle').onchange = e => { st.spSingle = e.target.checked; save(); render(); };
 $('gradesOn').onchange = e => { st.gradesOn = e.target.checked; save(); render(); };
 
 // Sichern und Laden
@@ -775,7 +770,7 @@ const exportJSON = () => JSON.stringify({ app: APPID, v: 1, gespeichert: new Dat
 const toCode = () => btoa(unescape(encodeURIComponent(exportJSON())));
 function importData(obj) {
   if (!obj || obj.app !== APPID || !obj.st) throw new Error('kein Abitur-Planer-Stand');
-  st = Object.assign({}, DEF, obj.st); save(); render();
+  st = Object.assign({}, DEF, obj.st, { spSingle: false }); save(); render();
   const d = obj.gespeichert ? new Date(obj.gespeichert).toLocaleDateString('de-DE') : '';
   $('saveMsg').textContent = 'Stand geladen' + (d ? ' (gespeichert am ' + d + ')' : '') + '.';
 }
