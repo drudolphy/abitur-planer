@@ -5,57 +5,53 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Abitur-Planer BGY</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Condensed:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Karla:wght@300;400;600;700&family=Lato:wght@400;700&display=swap" rel="stylesheet">
 <style>
 :root{
-  /* Layout: Einstellungen oben als Raster, darunter Prüfungsvarianten, Einbringungstabelle (zugleich Notenraster), Block II, Regeln */
-  --bg:#f4f4f1; --surface:#ffffff; --ink:#1c2230; --muted:#5b6372; --line:#d9d8d2;
-  --accent:#b3261e; --accent-ink:#ffffff; --accent-soft:#f7e2df;
-  --lf:#f2d4d7; --pf:#d9e6f6; --sel:#dcefe0; --dim:#efeee9;
-  --ok:#1d7a3e; --warn:#9a5a00; --bad:#b3261e;
-  --font-display:'IBM Plex Sans Condensed','Arial Narrow',sans-serif;
-  --font-body:'IBM Plex Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
-  --font-mono:'IBM Plex Mono',ui-monospace,Consolas,monospace;
+  /* Design nach bbs-io.de: blauer Balken oben, weißer Kopf mit Logo, Karla-Überschriften in Dunkelblau, Lato im Text */
+  --bg:#f0f3f6; --surface:#ffffff; --ink:#393939; --muted:#666666; --line:#dde2ea;
+  --accent:#2b3479; --accent-ink:#ffffff; --accent-soft:#e7ecf6; --accent2:#477abf;
+  --lf:#dde1f1; --pf:#dbe8f7; --sel:#e1f1e5; --dim:#eef1f5;
+  --ok:#1d7a3e; --warn:#9a5a00; --bad:#b3261e; --bad-soft:#f8e3e1;
+  --font-display:'Karla','Lato',Arial,sans-serif;
+  --font-body:'Lato','Open Sans',Arial,sans-serif;
+  --font-mono:'Karla','Lato',Arial,sans-serif;
   color-scheme:light;
 }
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
-  --bg:#13161c; --surface:#1b1f27; --ink:#e7e8eb; --muted:#a2a9b6; --line:#2f3542;
-  --accent:#ff7d70; --accent-ink:#1b0f0e; --accent-soft:#3b201e;
-  --lf:#46282d; --pf:#20314a; --sel:#1f3a28; --dim:#232832;
-  --ok:#62d08c; --warn:#f0b35a; --bad:#ff7d70; color-scheme:dark;}}
-:root[data-theme="dark"]{
-  --bg:#13161c; --surface:#1b1f27; --ink:#e7e8eb; --muted:#a2a9b6; --line:#2f3542;
-  --accent:#ff7d70; --accent-ink:#1b0f0e; --accent-soft:#3b201e;
-  --lf:#46282d; --pf:#20314a; --sel:#1f3a28; --dim:#232832;
-  --ok:#62d08c; --warn:#f0b35a; --bad:#ff7d70; color-scheme:dark;}
 *{box-sizing:border-box}
 html,body{margin:0}
 body{background:var(--bg);color:var(--ink);font:15px/1.5 var(--font-body)}
-.wrap{max-width:1120px;margin:0 auto;padding:20px 16px 60px;display:grid;gap:22px}
-header{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px;border-bottom:3px solid var(--accent);padding-bottom:12px}
-h1{font:700 30px/1.1 var(--font-display);margin:0;letter-spacing:.2px;text-wrap:balance}
-h1 small{display:block;font:500 14px/1.4 var(--font-body);color:var(--muted);letter-spacing:0;margin-top:4px}
-h2{font:700 20px/1.2 var(--font-display);margin:0;text-wrap:balance;display:flex;gap:10px;align-items:baseline}
-h2 .no{font:600 13px var(--font-mono);color:var(--accent)}
+.wrap{max-width:1120px;margin:0 auto;padding:22px 16px 60px;display:grid;gap:22px}
+body{border-top:12px solid var(--accent2)}
+.topbar{background:var(--surface);border-bottom:1px solid var(--line)}
+.topbar .in{max-width:1120px;margin:0 auto;padding:14px 16px;display:flex;flex-wrap:wrap;gap:14px 22px;align-items:center}
+.topbar img{height:70px;width:auto;display:block}
+.topbar nav{font:500 14px var(--font-body);text-transform:uppercase;letter-spacing:.3px;color:var(--muted);display:flex;gap:16px;flex-wrap:wrap}
+.topbar nav a{color:inherit;text-decoration:none}.topbar nav a:hover{color:var(--accent)}
+header{display:grid;gap:6px;padding:4px 0 6px}
+h1{font:600 32px/1.15 var(--font-display);margin:0;color:var(--accent);text-wrap:balance}
+h1 small{display:block;font:400 15px/1.45 var(--font-body);color:var(--muted);margin-top:4px}
+h2{font:600 22px/1.2 var(--font-display);margin:0;color:var(--accent);text-wrap:balance;display:flex;gap:10px;align-items:baseline}
+h2 .no{font:700 13px var(--font-display);color:var(--accent-ink);background:var(--accent2);padding:2px 7px;border-radius:3px}
 .sect{display:grid;gap:12px}
 .lead{color:var(--muted);margin:0;max-width:72ch}
-.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:4px;padding:14px 16px}
 .settings{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}
 .field{display:grid;gap:6px;align-content:start}
 .field>label,.field>.lbl{font-weight:600;font-size:13px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px}
 select,input[type=text]{font:inherit;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:7px;padding:8px 10px;width:100%}
-select:focus-visible,input:focus-visible,button:focus-visible,.opt:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+select:focus-visible,input:focus-visible,button:focus-visible,.opt:focus-visible{outline:2px solid var(--accent2);outline-offset:2px}
 .radios{display:grid;gap:6px}
 .radios label,.check{display:flex;gap:8px;align-items:flex-start;font-size:14px;cursor:pointer}
-.radios input,.check input{margin-top:3px;accent-color:var(--accent)}
-.jginfo{border-left:4px solid var(--accent);background:var(--accent-soft);border-radius:0 8px 8px 0;padding:10px 14px;display:grid;gap:4px}
+.radios input,.check input{margin-top:3px;accent-color:var(--accent2)}
+.jginfo{border-left:4px solid var(--accent2);background:var(--accent-soft);border-radius:0 8px 8px 0;padding:10px 14px;display:grid;gap:4px}
 .jginfo b{font-family:var(--font-display);font-size:16px}
 .jginfo ul{margin:0;padding-left:18px}
 .opts{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
-.opt{background:var(--surface);border:1.5px solid var(--line);border-radius:10px;padding:10px 12px;cursor:pointer;display:grid;gap:4px;text-align:left;font:inherit;color:inherit}
+.opt{background:var(--surface);border:1.5px solid var(--line);border-radius:4px;padding:10px 12px;cursor:pointer;display:grid;gap:4px;text-align:left;font:inherit;color:inherit}
 .opt:hover{border-color:var(--muted)}
-.opt[aria-pressed="true"]{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-soft) inset}
-.opt .tag{font:600 12px var(--font-mono);color:var(--accent)}
+.opt[aria-pressed="true"]{border-color:var(--accent2);box-shadow:0 0 0 3px var(--accent-soft)}
+.opt .tag{font:700 12px var(--font-display);color:var(--accent2);text-transform:uppercase;letter-spacing:.3px}
 .opt .subs{font-weight:600;font-size:16px}
 .opt .meta{font-size:12.5px;color:var(--muted)}
 .opt .score{font:600 14px var(--font-mono)}
@@ -65,22 +61,24 @@ select:focus-visible,input:focus-visible,button:focus-visible,.opt:focus-visible
 .vol{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
 .vol select{width:auto;min-width:220px}
 .summary{display:flex;flex-wrap:wrap;gap:10px}
-.tile{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 14px;min-width:150px;display:grid}
+.tile{background:var(--surface);border:1px solid var(--line);border-top:3px solid var(--accent2);border-radius:4px;padding:10px 14px;min-width:150px;display:grid}
 .tile .k{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;font-weight:600}
-.tile .v{font:600 24px/1.2 var(--font-mono);font-variant-numeric:tabular-nums}
+.tile .v{font:700 26px/1.2 var(--font-display);color:var(--accent);font-variant-numeric:tabular-nums}
 .tile .s{font-size:12.5px;color:var(--muted)}
-.tile.good{border-color:var(--ok)} .tile.good .v{color:var(--ok)}
-.tile.badt{border-color:var(--bad)} .tile.badt .v{color:var(--bad)}
+.tile.good{border-color:var(--line);border-top-color:var(--ok)} .tile.good .v{color:var(--ok)}
+.tile.badt{border-color:var(--line);border-top-color:var(--bad)} .tile.badt .v{color:var(--bad)}
 [hidden]{display:none!important}
 .savebox{display:grid;gap:10px}
 textarea{font:13px var(--font-mono);color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:7px;padding:8px;width:100%;resize:vertical}
 .toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
 button.btn{font:600 14px var(--font-body);border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:7px;padding:7px 12px;cursor:pointer}
-button.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
-.tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:var(--surface)}
+button.btn{border-radius:3px}
+button.btn.primary{background:var(--accent2);color:#fff;border-color:var(--accent2);text-transform:uppercase;font-size:13px;letter-spacing:.4px}
+button.btn.primary:hover{background:var(--accent)}
+.tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:4px;background:var(--surface)}
 table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums}
 th,td{padding:7px 9px;border-bottom:1px solid var(--line);text-align:left;vertical-align:middle}
-thead th{font-size:12px;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);background:var(--dim);position:sticky;top:0}
+thead th{font-size:12px;text-transform:uppercase;letter-spacing:.4px;color:#fff;background:var(--accent);position:sticky;top:0}
 tbody tr:last-child td{border-bottom:none}
 td.fach{font-weight:600;min-width:170px}
 td.fach .x2{font:600 11px var(--font-mono);background:var(--accent);color:var(--accent-ink);border-radius:4px;padding:0 5px;margin-left:6px}
@@ -88,8 +86,8 @@ td.fach .x2{font:600 11px var(--font-mono);background:var(--accent);color:var(--
 .role.LF{background:var(--lf)} .role.PF{background:var(--pf)} .role.GF,.role.KF,.role.GFfw{background:var(--dim)}
 td.c{text-align:center;width:74px;font-size:12.5px;color:var(--muted)}
 td.c.must{color:var(--ink);font-weight:600}
-td.c.must::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--accent);margin-right:5px;vertical-align:1px}
-td.c.alt::before{background:transparent;border:1.5px solid var(--accent)}
+td.c.must::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--accent2);margin-right:5px;vertical-align:1px}
+td.c.alt::before{background:transparent;border:1.5px solid var(--accent2)}
 td.c.na{color:var(--line)}
 td.c.in{background:var(--sel)}
 td.c.out input{opacity:.55}
@@ -102,7 +100,7 @@ td.rule{font-size:13px;color:var(--muted);min-width:200px}
 .legend span{display:inline-flex;gap:6px;align-items:center}
 .sw{width:14px;height:14px;border-radius:3px;display:inline-block;border:1px solid var(--line)}
 .msg{border-radius:8px;padding:9px 12px;font-size:14px}
-.msg.bad{background:var(--accent-soft);color:var(--bad);font-weight:500}
+.msg.bad{background:var(--bad-soft);color:var(--bad);font-weight:600}
 .msg.info{background:var(--dim)}
 .b2grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px}
 .b2grid .card{display:grid;gap:6px;padding:10px 12px}
@@ -113,12 +111,16 @@ td.rule{font-size:13px;color:var(--muted);min-width:200px}
 .rules li{margin:3px 0}
 .rules h3{font:700 16px var(--font-display);margin:0}
 .foot{font-size:12.5px;color:var(--muted)}
-.foot a{color:var(--accent)}
+.foot a{color:var(--accent2)}
 @media (prefers-reduced-motion:no-preference){.opt,.tile{transition:border-color .15s}}
 @media (max-width:560px){h1{font-size:25px} td.rule{min-width:150px}}
 </style>
 </head>
 <body>
+<div class="topbar"><div class="in">
+  <a href="https://www.bbs-io.de/"><img src="https://bbs-io.de/wp-content/uploads/2022/05/logo-bbs-io_.png" alt="BBS Idar-Oberstein – Harald-Fissler-Schule" onerror="this.closest('a').style.display='none'"></a>
+  <nav aria-label="Schule"><a href="https://www.bbs-io.de/">Startseite bbs-io.de</a><span aria-hidden="true">·</span><span>Berufliches Gymnasium</span></nav>
+</div></div>
 <div class="wrap">
 <header>
   <h1>Abitur-Planer Berufliches Gymnasium<small>BBS Idar-Oberstein – Harald-Fissler-Schule · Was du ins Abitur einbringen musst und welche Kombination die meisten Punkte bringt</small></h1>
