@@ -206,7 +206,7 @@ td.rule{font-size:13px;color:var(--muted);min-width:200px}
     <div class="card"><h3>Block I – Qualifikationsphase</h3><ul>
       <li>Genau <b>36 Kurse</b> aus 12/1 bis 13/2 werden eingebracht (am BGY ersetzt ein zusätzlicher Kurs die Facharbeit).</li>
       <li>Alle Kurse der <b>3 Leistungsfächer</b> und der <b>mündlichen Prüfungsfächer</b>. Die zwei Leistungsfächer mit der höheren Punktsumme zählen <b>doppelt</b>.</li>
-      <li>Pflicht, soweit nicht schon Prüfungsfach: je 4 Kurse Deutsch, Mathematik, eine Naturwissenschaft und eine Fremdsprache (Englisch oder Spanisch); immer alle 4 Kurse Gemeinschaftskunde, auch wenn Religion/Ethik mündliches Prüfungsfach ist; 12/1 und 12/2 im künstlerischen Fach.</li>
+      <li>Pflicht, soweit nicht schon Prüfungsfach: je 4 Kurse Deutsch, Mathematik, eine Naturwissenschaft und Englisch – wer Spanisch als Pflichtfremdsprache ab Klasse 11 hat, kann stattdessen alle 4 Kurse Spanisch einbringen (§ 10 Abs. 6 AbiPrO); immer alle 4 Kurse Gemeinschaftskunde, auch wenn Religion/Ethik mündliches Prüfungsfach ist; 12/1 und 12/2 im künstlerischen Fach.</li>
       <li>Spanisch als Pflicht (neu ab 11): mindestens 2 Kurse, darunter 13/2; kein Kurs mit 0 Punkten. Wer die Fremdsprachenpflicht schon aus Klasse 7–10 erfüllt hat: mindestens 1 Kurs Spanisch (wenn freiwillig belegt) oder IV.</li>
       <li>Fachrichtung Wirtschaft: BWL/RW bzw. VWL als Grundfach kann eingebracht werden, muss aber nicht.</li>
       <li>Wer aus einem Pflicht-Grundfach einen Kurs einbringt, muss den Kurs <b>13/2</b> mit einbringen.</li>
@@ -346,7 +346,8 @@ function oralOptions(ctx) {
 /* Wahlpflicht je 4 Kurse: eine Fremdsprache (Englisch oder 2. FS) und – nur Technik – GK oder Religion/Ethik */
 function altGroups(st, ctx, oralSubs) {
   const pf = [...ctx.lf, ...oralSubs], groups = [];
-  const fs = ['E']; if (ctx.subjects.includes('FS2')) fs.push('FS2');
+  // § 10 Abs. 2 Nr. 1 b) und Abs. 6 AbiPrO: 4 Kurse Englisch; nur die ab Jgst. 11 begonnene Pflichtfremdsprache (Spanisch) kann sie mit allen 4 Kursen ersetzen
+  const fs = ['E']; if (st.fs2 === 'neu' && ctx.subjects.includes('FS2')) fs.push('FS2');
   if (!fs.some(k => pf.includes(k))) groups.push({ id: 'FS', members: fs });
   groups.push({ id: 'GW', members: ['GK'] }); // GK immer alle 4 Kurse (beide Fachrichtungen)
   return groups;
