@@ -208,7 +208,7 @@ td.rule{font-size:13px;color:var(--muted);min-width:200px}
       <li>Alle Kurse der <b>3 Leistungsfächer</b> und der <b>mündlichen Prüfungsfächer</b>. Die zwei Leistungsfächer mit der höheren Punktsumme zählen <b>doppelt</b>.</li>
       <li>Pflicht, soweit nicht schon Prüfungsfach: je 4 Kurse Deutsch, Mathematik, eine Naturwissenschaft und eine Fremdsprache (Englisch oder Spanisch); immer alle 4 Kurse Gemeinschaftskunde, auch wenn Religion/Ethik mündliches Prüfungsfach ist; 12/1 und 12/2 im künstlerischen Fach.</li>
       <li>Spanisch als Pflicht (neu ab 11): mindestens 2 Kurse, darunter 13/2; kein Kurs mit 0 Punkten. Wer die Fremdsprachenpflicht schon aus Klasse 7–10 erfüllt hat: mindestens 1 Kurs Spanisch (wenn freiwillig belegt) oder IV.</li>
-      <li>Fachrichtung Wirtschaft: zusätzlich je mindestens 1 Kurs BWL/RW und VWL.</li>
+      <li>Fachrichtung Wirtschaft: BWL/RW bzw. VWL als Grundfach kann eingebracht werden, muss aber nicht.</li>
       <li>Wer aus einem Pflicht-Grundfach einen Kurs einbringt, muss den Kurs <b>13/2</b> mit einbringen.</li>
       <li>Kein Kurs mit 0 Punkten, höchstens 7 Kurse unter 5 Punkten, mindestens 200 Punkte. Block I = Punktsumme (36 Kurse + 8 doppelte) × 40/44.</li>
     </ul></div>
@@ -382,7 +382,6 @@ function buildPlan(st, ctx, oralSubs, alt) {
       if (k === 'FS2' && st.fs2 === 'neu') { row.min = 2; row.text = 'mind. 2 Kurse, darunter 13/2; kein Kurs mit 0 Punkten'; }
       if (k === 'FS2' && st.fs2 === 'fort') { row.kind = 'GFfw'; row.rule13 = jg.oldTwoFS; row.text = jg.oldTwoFS ? 'freiwillig; wenn eingebracht, dann mit 13/2' : 'freiwillig, beliebige Kurse'; }
       const g = altOf(k); if (g) { row.altOther = true; row.text += ' · oder statt ' + g.members.filter(m => m !== k).map(m => subjName(m, st).replace(/ \(.*\)/, '')).join('/') + ' alle 4 Kurse'; }
-      if ((k === 'BWL' || k === 'VWL') && st.fr === 'W') { row.min = 1; row.text = 'mind. 1 Kurs: 13/2 (Pflicht)'; }
     }
     rows.push(row);
   }
